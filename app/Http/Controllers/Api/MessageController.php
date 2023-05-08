@@ -19,6 +19,19 @@ class MessageController extends Controller
 
     public function messagesById($id)
     {
+     
+        $data=Message::where(function($q)use($id){
+            $q->where('request_id',Auth::user()->id)->where('recived_id',$id);
+        })->orWhere(function($q)use($id){
+            $q->where('request_id',$id)->where('recived_id',Auth::user()->id);
+        })->orderby('created_at')->get();
+        
+        return response()->json([
+            'data' => $data,
+            'message' => 'Starting Chatting with your first massage',
+            'status' => true,
+        ]);
+    
         $permition = Message::where('request_id', Auth::user()->id)->where('recived_id', $id)->get();
         $permition1 = Message::where('request_id', $id)->where('recived_id', Auth::user()->id)->get();
         if ($permition || $permition1) {
